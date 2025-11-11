@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Player with Speed Control</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 40px;
+      }
+      iframe {
+        border: none;
+        margin-top: 20px;
+        width: 80%;
+        height: 450px;
+        max-width: 900px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      input {
+        padding: 10px;
+        width: 300px;
+        font-size: 16px;
+        margin-right: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .speed-controls {
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>YouTube Player on Localhost</h1>
+    <p>Enter a YouTube video ID (the part after <code>v=</code> in the URL):</p>
+
+    <div>
+      <input type="text" id="videoId" placeholder="e.g. dQw4w9WgXcQ" />
+      <button onclick="loadVideo()">Load Video</button>
+    </div>
+
+    <div id="player"></div>
+
+    <div class="speed-controls">
+      <h3>Playback Speed</h3>
+      <button onclick="setSpeed(1)">1x</button>
+      <button onclick="setSpeed(1.25)">1.25x</button>
+      <button onclick="setSpeed(1.5)">1.5x</button>
+      <button onclick="setSpeed(2)">2x</button>
+    </div>
+
+    <script>
+      let player;
+      const input = document.getElementById("videoId");
+      const savedId = localStorage.getItem("lastVideoId") || "dQw4w9WgXcQ";
+
+      // Load YouTube IFrame API dynamically
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(tag);
+
+      // Make sure the function is globally accessible
+      window.onYouTubeIframeAPIReady = function () {
+        player = new YT.Player("player", {
+          height: "450",
+          width: "80%",
+          videoId: savedId,
+          playerVars: {
+            controls: 1,
+            enablejsapi: 1,
+            modestbranding: 1,
+            rel: 0,
+            fs: 1,
+          },
+          events: {
+            onReady: () => {
+              input.value = savedId;
+            },
+          },
+        });
+      };
+
+      // Load a new video by ID
+      function loadVideo() {
+        const id = input.value.trim();
+        if (id) {
+          player.loadVideoById(id);
+          localStorage.setItem("lastVideoId", id);
+        } else {
+          alert("Please enter a valid YouTube video ID.");
+        }
+      }
+
+      // Change playback speed
+      function setSpeed(rate) {
+        if (player && player.setPlaybackRate) {
+          player.setPlaybackRate(rate);
+        }
+      }
+    </script>
+  </body>
+</html>
